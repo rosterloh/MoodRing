@@ -12,10 +12,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -26,8 +28,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
-import java.util.UUID;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.larswerkman.holocolorpicker.ColorPicker;
 import com.larswerkman.holocolorpicker.OpacityBar;
 import com.larswerkman.holocolorpicker.SVBar;
@@ -55,10 +59,25 @@ public class MoodRing extends Activity implements ServiceConnection {
     private Handler mScanHandler;
     private boolean mConnected = false;
 
-    // Stops scanning after 5 seconds.
-    private static final long SCAN_PERIOD = 5000;
+    private static long SCAN_PERIOD;
     private static final int REQUEST_ENABLE_BT = 1;
     private byte[] data = new byte[3];
+    private static Tracker sTracker;
+    private SharedPreferences sp;
+
+    public static synchronized Tracker getTracker(Context context) {
+        if (sTracker == null) {
+            sTracker = GoogleAnalytics.getInstance(context.getApplicationContext())
+                    .newTracker(R.xml.global_tracker);
+        }
+        return sTracker;
+    }
+
+    public static void trackView(Context context, String screenName) {
+        Tracker tracker = getTracker(context);
+        tracker.setScreenName(screenName);
+        tracker.send(new HitBuilders.AppViewBuilder().build());
+    }
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -86,7 +105,11 @@ public class MoodRing extends Activity implements ServiceConnection {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        trackView(this, TAG);
         setContentView(R.layout.activity_mood_ring);
+
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        SCAN_PERIOD = sp.getLong("scan_period", 2000);
 
         mHandler = new Handler();
         mScanHandler = new Handler();
@@ -287,21 +310,7 @@ public class MoodRing extends Activity implements ServiceConnection {
     @Override
     protected void onStop() {
         super.onStop();
-        if(mBluetoothLeService != null) {
-            mBluetoothLeService.disconnect();
-            mBluetoothLeService.close();
-            mBluetoothLeService = null;
-        }
-        mConnected = false;
         mScanHandler.removeCallbacks(mStatusChecker);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Wait for everything to shut down
-            }
-        }, 600);
-
         unregisterReceiver(mGattUpdateReceiver);
     }
 
@@ -309,6 +318,7 @@ public class MoodRing extends Activity implements ServiceConnection {
     public void onDestroy() {
         super.onDestroy();
         unbindService(this);
+        mBluetoothLeService = null;
     }
 
     @Override
