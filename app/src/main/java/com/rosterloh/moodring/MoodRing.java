@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -107,6 +108,10 @@ public class MoodRing extends Activity implements ServiceConnection {
         super.onCreate(savedInstanceState);
         trackView(this, TAG);
         setContentView(R.layout.activity_mood_ring);
+
+        // ensure that Bluetooth exists
+        if (!ensureBLEExists())
+            finish();
 
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         SCAN_PERIOD = sp.getLong("scan_period", 2000);
@@ -354,5 +359,13 @@ public class MoodRing extends Activity implements ServiceConnection {
     @Override
     public void onServiceDisconnected(ComponentName componentName) {
         mBluetoothLeService = null;
+    }
+
+    private boolean ensureBLEExists() {
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, R.string.no_ble, Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
     }
 }

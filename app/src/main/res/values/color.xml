@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="featureTitleColor">#939597</color>
+    <color name="actionBarColor">#3F3F3F</color>
+    <color name="backgroundColor">#040404</color>
+    <color name="headerBackgroundColor">#E46A6B</color>
+    <color name="headerTextColor">#FFFFFF</color>
+    <color name="dividerColor">#BBBDC0</color>
+    <color name="drawerBackgroundColor">#AAABAF</color>
+
+    <color name="darkRed">#550000</color>
+    <color name="mediumRed">#AA3939</color>
+    <color name="lightRed">#D46A6A</color>
+    <color name="lightestRed">#FFAAAA</color>
+
+    <color name="mediumGray">#6E6E6E</color>
+    <color name="darkGray">#AAABAF</color>
+</resources>
