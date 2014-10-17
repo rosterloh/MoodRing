@@ -1,4 +1,4 @@
-#MoodRing
+#MoodRing [![Build Status](https://travis-ci.org/rosterloh/MoodRing.png)](https://travis-ci.org/rosterloh/MoodRing)
 
 App to control Blend Micro attached to NeoPixel ring
 
