@@ -6,6 +6,43 @@
     android:layout_height="match_parent"
     tools:context=".MoodRingActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mood_feature_title_long_margin"
+        android:rotation="270"
+        android:text="@string/mood_feature_title_long"
+        android:textColor="@color/darkGray"
+        android:textSize="32dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/battery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/feature_horizontal_margin"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/battery"
+        android:freezesText="true"
+        android:gravity="center"
+        android:text="@string/not_available"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_toEndOf="@+id/battery"
+        android:ellipsize="end"
+        android:freezesText="true"
+        android:maxLines="1"
+        android:text="@string/default_device_name"
+        android:textAllCaps="true"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -33,6 +70,15 @@
             android:layout_gravity="center"
             android:text="@string/no_apps" />
     </FrameLayout>
+
+    <Button
+        android:id="@+id/action_connect"
+        android:minWidth="160dip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_bottom"
+        android:onClick="onConnectClicked"
+        android:text="@string/action_connect" />
 
     <!-- The navigation drawer -->
 

@@ -9,4 +9,5 @@
     <dimen name="feature_section_padding">8dp</dimen>
     <dimen name="drawer_width">179dp</dimen>
     <dimen name="drawer_padding_top">8dp</dimen>
+    <dimen name="mood_feature_title_long_margin">-192dp</dimen>
 </resources>

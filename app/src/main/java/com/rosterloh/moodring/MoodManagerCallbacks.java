@@ -17,4 +17,6 @@ public interface MoodManagerCallbacks extends BleManagerCallbacks {
      *            the new value
      */
     public void onMoodValueReceived(double value);
+
+    public void onRxValueReceived(byte[] rx);
 }

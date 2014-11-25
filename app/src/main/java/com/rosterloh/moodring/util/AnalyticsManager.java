@@ -6,6 +6,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.rosterloh.moodring.BuildConfig;
+import com.rosterloh.moodring.R;
 
 import static com.rosterloh.moodring.util.LogUtils.LOGD;
 

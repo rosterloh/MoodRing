@@ -21,6 +21,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.rosterloh.moodring.R;
+
 public abstract class BleProfileService extends Service implements BleManagerCallbacks {
 	@SuppressWarnings("unused")
 	private static final String TAG = "BleProfileService";

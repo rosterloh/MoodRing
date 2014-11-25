@@ -38,5 +38,8 @@
     <string name="mood_notification_connected_message">%s is connected.</string>
     <string name="mood_notification_action_disconnect">Disconnect</string>
     <string name="mood_feature_title">Mood</string>
+    <string name="mood_feature_title_long">MOOD RING</string>
+    <string name="default_device_name">MOOD DEVICE</string>
+    <string name="mood_about_text">Set your NeoPixel Ring to suit your mood</string>
 
 </resources>

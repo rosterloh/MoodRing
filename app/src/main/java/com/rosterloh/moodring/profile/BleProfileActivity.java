@@ -10,6 +10,7 @@ package com.rosterloh.moodring.profile;
 
 import java.util.UUID;
 
+import com.rosterloh.moodring.R;
 import com.rosterloh.moodring.scanner.ScannerFragment;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -122,7 +123,7 @@ public abstract class BleProfileActivity extends Activity implements BleManagerC
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		getMenuInflater().inflate(R.menu.help, menu);
+		//getMenuInflater().inflate(R.menu.help, menu);
 		return true;
 	}
 

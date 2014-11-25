@@ -7,10 +7,15 @@
 package com.rosterloh.moodring;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
@@ -18,13 +23,16 @@ import android.view.MenuItem;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.rosterloh.moodring.profile.BleProfileService;
 import com.rosterloh.moodring.profile.BleProfileServiceReadyActivity;
 import com.rosterloh.moodring.util.AnalyticsManager;
+
+import java.util.UUID;
 
 import static com.rosterloh.moodring.util.LogUtils.LOGD;
 import static com.rosterloh.moodring.util.LogUtils.makeLogTag;
 
-public class MoodRingActivity extends Activity, BleProfileServiceReadyActivity<MoodService.RSCBinder> {
+public class MoodRingActivity extends BleProfileServiceReadyActivity<MoodService.MoodBinder> {
     private static final String TAG = makeLogTag(MoodRingActivity.class);
     private static final String SCREEN_LABEL = "MoodRing";
     private static final String UTILS_CATEGORY = "com.rosterloh.moodring.UTILS";
@@ -33,14 +41,9 @@ public class MoodRingActivity extends Activity, BleProfileServiceReadyActivity<M
     private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreateView(final Bundle savedInstanceState) {
         AnalyticsManager.initializeAnalyticsTracker(getApplicationContext());
         setContentView(R.layout.activity_moods);
-
-        // ensure that Bluetooth exists
-        if (!ensureBLEExists())
-            finish();
 
         final DrawerLayout drawer = mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -60,6 +63,37 @@ public class MoodRingActivity extends Activity, BleProfileServiceReadyActivity<M
 
         AnalyticsManager.sendScreenView(SCREEN_LABEL);
         LOGD("Tracker", SCREEN_LABEL);
+    }
+
+    @Override
+    protected void onInitialize() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, makeIntentFilter());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+    }
+
+    @Override
+    protected void setDefaultUI() {
+        // restore default UI elements before reconnecting
+    }
+
+    @Override
+    protected int getLoggerProfileTitle() {
+        return R.string.app_name;
+    }
+
+    @Override
+    protected int getDefaultDeviceName() {
+        return R.string.default_device_name;
+    }
+
+    @Override
+    protected int getAboutTextId() {
+        return R.string.mood_about_text;
     }
 
     @Override
@@ -97,5 +131,52 @@ public class MoodRingActivity extends Activity, BleProfileServiceReadyActivity<M
             return false;
         }
         return true;
+    }
+
+    @Override
+    protected Class<? extends BleProfileService> getServiceClass() {
+        return MoodService.class;
+    }
+
+    @Override
+    protected UUID getFilterUUID() {
+        return MoodManager.MOOD_SERVICE_UUID;
+    }
+
+    @Override
+    protected void onServiceBinded(final MoodService.MoodBinder binder) {
+        // not used
+    }
+
+    @Override
+    protected void onServiceUnbinded() {
+        // not used
+    }
+
+    @Override
+    public void onServicesDiscovered(final boolean optionalServicesFound) {
+        // not used
+    }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            final String action = intent.getAction();
+
+            if (MoodService.BROADCAST_MOOD_READ.equals(action)) {
+                final double batt = intent.getDoubleExtra(MoodService.EXTRA_TEMPERATURE, 0);
+                // Update GUI
+
+            } else if (MoodService.BROADCAST_BATTERY_LEVEL.equals(action)) {
+
+            }
+        }
+    };
+
+    private static IntentFilter makeIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MoodService.BROADCAST_MOOD_READ);
+        intentFilter.addAction(MoodService.BROADCAST_BATTERY_LEVEL);
+        return intentFilter;
     }
 }

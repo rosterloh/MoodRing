@@ -35,12 +35,12 @@ public class MoodService extends BleProfileService implements MoodManagerCallbac
     private MoodManager mManager;
     private boolean mBound;
 
-    private final LocalBinder mBinder = new RSCBinder();
+    private final LocalBinder mBinder = new MoodBinder();
 
     /**
      * This local binder is an interface for the bound activity to operate with the Mood Ring
      */
-    public class RSCBinder extends LocalBinder {
+    public class MoodBinder extends LocalBinder {
         // empty
     }
 
@@ -95,6 +95,13 @@ public class MoodService extends BleProfileService implements MoodManagerCallbac
         // when the activity closes we need to show the notification that user is connected to the sensor
         createNotifcation(R.string.mood_notification_connected_message, 0);
         return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onRxValueReceived(final byte[] rx) {
+        final Intent broadcast = new Intent(BROADCAST_MOOD_READ);
+        broadcast.putExtra(EXTRA_TEMPERATURE, rx[0]);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
     }
 
     @Override
