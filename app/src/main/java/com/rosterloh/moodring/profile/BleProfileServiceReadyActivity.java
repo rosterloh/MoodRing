@@ -12,7 +12,6 @@ import java.util.UUID;
 
 import com.rosterloh.moodring.R;
 import com.rosterloh.moodring.scanner.ScannerFragment;
-import android.app.Activity;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -28,6 +27,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,7 +47,7 @@ import android.widget.Toast;
  * the activity, activity will to bind to the service and refresh UI.
  * </p>
  */
-public abstract class BleProfileServiceReadyActivity<E extends BleProfileService.LocalBinder> extends Activity implements ScannerFragment.OnDeviceSelectedListener {
+public abstract class BleProfileServiceReadyActivity<E extends BleProfileService.LocalBinder> extends ActionBarActivity implements ScannerFragment.OnDeviceSelectedListener {
 	private static final String TAG = "BleProfileServiceReadyActivity";
 
 	private static final String DEVICE_NAME = "device_name";

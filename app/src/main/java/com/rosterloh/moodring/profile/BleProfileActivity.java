@@ -12,7 +12,6 @@ import java.util.UUID;
 
 import com.rosterloh.moodring.R;
 import com.rosterloh.moodring.scanner.ScannerFragment;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -20,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,7 +28,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public abstract class BleProfileActivity extends Activity implements BleManagerCallbacks, ScannerFragment.OnDeviceSelectedListener {
+public abstract class BleProfileActivity extends ActionBarActivity implements BleManagerCallbacks, ScannerFragment.OnDeviceSelectedListener {
 	private static final String TAG = "BaseProfileActivity";
 
 	private static final String CONNECTION_STATUS = "connection_status";
