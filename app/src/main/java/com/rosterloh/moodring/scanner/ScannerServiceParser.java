@@ -40,11 +40,13 @@ public class ScannerServiceParser {
 	 * For further details on parsing BLE advertisement packet data see https://developer.bluetooth.org/Pages/default.aspx Bluetooth Core Specifications Volume 3, Part C, and Section 8
 	 * </p>
 	 */
-	public static boolean decodeDeviceAdvData(byte[] data, UUID requiredUUID) {
+	public static boolean decodeDeviceAdvData(byte[] data, UUID requiredUUID, boolean discoverableRequired) {
 		final String uuid = requiredUUID != null ? requiredUUID.toString() : null;
 		if (data != null) {
-			boolean connectable = false;
+			boolean connectable = !discoverableRequired;
 			boolean valid = uuid == null;
+            if (connectable && valid)
+                return true;
 			int fieldLength, fieldName;
 			int packetLength = data.length;
 			for (int index = 0; index < packetLength; index++) {
@@ -66,7 +68,7 @@ public class ScannerServiceParser {
 							valid = valid || decodeService128BitUUID(uuid, data, i, 16);
 					}
 				}
-				if (fieldName == FLAGS_BIT) {
+                if (!connectable && fieldName == FLAGS_BIT) {
 					int flags = data[index + 1];
 					connectable = (flags & (LE_GENERAL_DISCOVERABLE_MODE | LE_LIMITED_DISCOVERABLE_MODE)) > 0;
 				}

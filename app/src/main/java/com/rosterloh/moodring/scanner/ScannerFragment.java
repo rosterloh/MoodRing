@@ -41,7 +41,7 @@ public class ScannerFragment extends DialogFragment {
 	private final static String TAG = "ScannerFragment";
 
 	private final static String PARAM_UUID = "param_uuid";
-	private final static String CUSTOM_UUID = "custom_uuid";
+    private final static String DISCOVERABLE_REQUIRED = "discoverable_required";
 	private final static long SCAN_DURATION = 5000;
 
 	private BluetoothAdapter mBluetoothAdapter;
@@ -50,7 +50,7 @@ public class ScannerFragment extends DialogFragment {
 	private Handler mHandler = new Handler();
 	private Button mScanButton;
 
-	private boolean mIsCustomUUID;
+    private boolean mDiscoverableRequired;
 	private UUID mUuid;
 
 	private boolean mIsScanning = false;
@@ -63,12 +63,12 @@ public class ScannerFragment extends DialogFragment {
 	 * Static implementation of fragment so that it keeps data when phone orientation is changed For standard BLE Service UUID, we can filter devices using normal android provided command
 	 * startScanLe() with required BLE Service UUID For custom BLE Service UUID, we will use class ScannerServiceParser to filter out required device.
 	 */
-	public static ScannerFragment getInstance(final Context context, final UUID uuid, final boolean isCustomUUID) {
+	public static ScannerFragment getInstance(final Context context, final UUID uuid, final boolean discoverableRequired) {
 		final ScannerFragment fragment = new ScannerFragment();
 
 		final Bundle args = new Bundle();
 		args.putParcelable(PARAM_UUID, new ParcelUuid(uuid));
-		args.putBoolean(CUSTOM_UUID, isCustomUUID);
+		args.putBoolean(DISCOVERABLE_REQUIRED, discoverableRequired);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -112,11 +112,11 @@ public class ScannerFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 
 		final Bundle args = getArguments();
-		if (args.containsKey(CUSTOM_UUID)) {
+		if (args.containsKey(PARAM_UUID)) {
 			final ParcelUuid pu = args.getParcelable(PARAM_UUID);
 			mUuid = pu.getUuid();
 		}
-		mIsCustomUUID = args.getBoolean(CUSTOM_UUID);
+        mDiscoverableRequired = args.getBoolean(DISCOVERABLE_REQUIRED);
 
 		final BluetoothManager manager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = manager.getAdapter();
@@ -187,14 +187,8 @@ public class ScannerFragment extends DialogFragment {
 		mAdapter.clearDevices();
 		mScanButton.setText(R.string.scanner_action_cancel);
 
-		mIsCustomUUID = true; // Samsung Note II with Android 4.3 build JSS15J.N7100XXUEMK9 is not filtering by UUID at all. We have to disable it
-		if (mIsCustomUUID) {
-			mBluetoothAdapter.startLeScan(mLEScanCallback);
-		} else {
-			final UUID[] uuids = new UUID[1];
-			uuids[0] = mUuid;
-			mBluetoothAdapter.startLeScan(uuids, mLEScanCallback);
-		}
+        // Samsung Note II with Android 4.3 build JSS15J.N7100XXUEMK9 is not filtering by UUID at all. We must parse UUIDs manually
+        mBluetoothAdapter.startLeScan(mLEScanCallback);
 
 		mIsScanning = true;
 		mHandler.postDelayed(new Runnable() {
@@ -229,24 +223,28 @@ public class ScannerFragment extends DialogFragment {
 	 * if scanned device already in the list then update it otherwise add as a new device
 	 */
 	private void addScannedDevice(final BluetoothDevice device, final String name, final int rssi, final boolean isBonded) {
-		getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mAdapter.addOrUpdateDevice(new ExtendedBluetoothDevice(device, name, rssi, isBonded));
-			}
-		});
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mAdapter.addOrUpdateDevice(new ExtendedBluetoothDevice(device, name, rssi, isBonded));
+                }
+            });
+        }
 	}
 
 	/**
 	 * if scanned device already in the list then update it otherwise add as a new device.
 	 */
 	private void updateScannedDevice(final BluetoothDevice device, final int rssi) {
-		getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mAdapter.updateRssiOfBondedDevice(device.getAddress(), rssi);
-			}
-		});
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mAdapter.updateRssiOfBondedDevice(device.getAddress(), rssi);
+                }
+            });
+        }
 	}
 
 	/**
@@ -255,23 +253,19 @@ public class ScannerFragment extends DialogFragment {
 	private BluetoothAdapter.LeScanCallback mLEScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-			if (device != null) {
-				updateScannedDevice(device, rssi);
-				if (mIsCustomUUID) {
-					try {
-						if (ScannerServiceParser.decodeDeviceAdvData(scanRecord, mUuid)) {
-							// On some devices device.getName() is always null. We have to parse the name manually :(
-							// This bug has been found on Sony Xperia Z1 (C6903) with Android 4.3.
-							// https://devzone.nordicsemi.com/index.php/cannot-see-device-name-in-sony-z1
-							addScannedDevice(device, ScannerServiceParser.decodeDeviceName(scanRecord), rssi, DEVICE_NOT_BONDED);
-						}
-					} catch (Exception e) {
-						Log.e(TAG, "Invalid data in Advertisement packet " + e.toString());
-					}
-				} else {
-					addScannedDevice(device, ScannerServiceParser.decodeDeviceName(scanRecord), rssi, DEVICE_NOT_BONDED);
-				}
-			}
+	    if (device != null) {
+            updateScannedDevice(device, rssi);
+            try {
+                if (ScannerServiceParser.decodeDeviceAdvData(scanRecord, mUuid, mDiscoverableRequired)) {
+                    // On some devices device.getName() is always null. We have to parse the name manually :(
+                    // This bug has been found on Sony Xperia Z1 (C6903) with Android 4.3.
+                    // https://devzone.nordicsemi.com/index.php/cannot-see-device-name-in-sony-z1
+                    addScannedDevice(device, ScannerServiceParser.decodeDeviceName(scanRecord), rssi, DEVICE_NOT_BONDED);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Invalid data in Advertisement packet " + e.toString());
+            }
+        }
 		}
 	};
 }

@@ -60,7 +60,7 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 		 * See the Proximity profile for Service approach.
 		 */
 		mBleManager = initializeManager();
-		onInitialize();
+		onInitialize(savedInstanceState);
 		onCreateView(savedInstanceState);
 		onViewCreated(savedInstanceState);
 	}
@@ -68,7 +68,7 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 	/**
 	 * You may do some initialization here. This method is called from {@link #onCreate(Bundle)} before the view was created.
 	 */
-	protected void onInitialize() {
+	protected void onInitialize(final Bundle savedInstanceState) {
 		// empty default implementation
 	}
 

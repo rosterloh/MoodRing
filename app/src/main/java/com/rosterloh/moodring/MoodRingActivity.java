@@ -17,12 +17,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.rosterloh.moodring.adapters.AppAdapter;
 import com.rosterloh.moodring.profile.BleProfileService;
 import com.rosterloh.moodring.profile.BleProfileServiceReadyActivity;
 import com.rosterloh.moodring.util.AnalyticsManager;
@@ -45,14 +45,12 @@ public class MoodRingActivity extends BleProfileServiceReadyActivity<MoodService
         AnalyticsManager.initializeAnalyticsTracker(getApplicationContext());
         setContentView(R.layout.activity_moods);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(toolbar);
-
         final DrawerLayout drawer = mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         // Set the drawer toggle as the DrawerListener
-        drawer.setDrawerListener(mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close));
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close);
+        drawer.setDrawerListener(mDrawerToggle);
 
         // setup plug-ins in the drawer
         //setupPluginsInDrawer((ViewGroup) drawer.findViewById(R.id.plugin_container));
@@ -62,14 +60,12 @@ public class MoodRingActivity extends BleProfileServiceReadyActivity<MoodService
         grid.setAdapter(new AppAdapter(this));
         grid.setEmptyView(findViewById(android.R.id.empty));
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
         AnalyticsManager.sendScreenView(SCREEN_LABEL);
         LOGD("Tracker", SCREEN_LABEL);
     }
 
     @Override
-    protected void onInitialize() {
+    protected void onInitialize(final Bundle savedInstanceState) {
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, makeIntentFilter());
     }
 

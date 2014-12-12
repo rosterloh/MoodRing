@@ -2,6 +2,7 @@
 <resources>
     <color name="featureTitleColor">#939597</color>
     <color name="actionBarColor">#3F3F3F</color>
+    <color name="actionBarColorDark">#3F3F3F</color>
     <color name="backgroundColor">#040404</color>
     <color name="headerBackgroundColor">#E46A6B</color>
     <color name="headerTextColor">#FFFFFF</color>

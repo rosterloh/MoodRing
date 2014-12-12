@@ -7,9 +7,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0-rc1'
+        classpath 'com.android.tools.build:gradle:1.0.0'
         // run gradle dependencyUpdates -Drevision=release @see https://github.com/ben-manes/gradle-versions-plugin
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.5'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.6'
     }
 }
 

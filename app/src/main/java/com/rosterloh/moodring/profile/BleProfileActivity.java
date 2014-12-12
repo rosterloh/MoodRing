@@ -61,7 +61,7 @@ public abstract class BleProfileActivity extends ActionBarActivity implements Bl
 		 * See the Proximity profile for Service approach.
 		 */
 		mBleManager = initializeManager();
-		onInitialize();
+		onInitialize(savedInstanceState);
 		onCreateView(savedInstanceState);
 		onViewCreated(savedInstanceState);
 	}
@@ -69,7 +69,7 @@ public abstract class BleProfileActivity extends ActionBarActivity implements Bl
 	/**
 	 * You may do some initialization here. This method is called from {@link #onCreate(Bundle)} before the view was created.
 	 */
-	protected void onInitialize() {
+	protected void onInitialize(final Bundle savedInstanceState) {
 		// empty default implementation
 	}
 
@@ -89,7 +89,7 @@ public abstract class BleProfileActivity extends ActionBarActivity implements Bl
 	 */
 	protected final void onViewCreated(final Bundle savedInstanceState) {
 		// set GUI
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		mConnectButton = (Button) findViewById(R.id.action_connect);
 		mDeviceNameView = (TextView) findViewById(R.id.device_name);
 		mBatteryLevelView = (TextView) findViewById(R.id.battery);
@@ -159,7 +159,7 @@ public abstract class BleProfileActivity extends ActionBarActivity implements Bl
 		if (isBLEEnabled()) {
 			if (!mDeviceConnected) {
 				setDefaultUI();
-				showDeviceScanningDialog(getFilterUUID(), isCustomFilterUUID());
+				showDeviceScanningDialog(getFilterUUID(), isDiscoverableRequired());
 			} else {
 				mBleManager.disconnect();
 			}
@@ -308,7 +308,8 @@ public abstract class BleProfileActivity extends ActionBarActivity implements Bl
 	protected abstract void setDefaultUI();
 
 	/**
-	 * Returns the default device name resource id. The real device name is obtained when connecting to the device. This one is used when device has disconnected.
+	 * Returns the default device name resource id. The real device name is obtained when connecting to the device. This one is used when device has
+     * disconnected.
 	 * 
 	 * @return the default device name resource id
 	 */
@@ -322,20 +323,20 @@ public abstract class BleProfileActivity extends ActionBarActivity implements Bl
 	protected abstract int getAboutTextId();
 
 	/**
-	 * The UUID filter is used to filter out available devices that does not have such UUID in their advertisement packet. See also: {@link #isChangingConfigurations()}.
+	 * The UUID filter is used to filter out available devices that does not have such UUID in their advertisement packet. See also:
+     * {@link #isChangingConfigurations()}.
 	 * 
 	 * @return the required UUID or <code>null</code>
 	 */
 	protected abstract UUID getFilterUUID();
 
 	/**
-	 * As the Android SDK can filter automatically only base SIG UUIDs, this flag allows to filter proprietary UUIDs using custom advertising data parsing. Default implementation returns
-	 * <code>false</code>.
-	 * 
-	 * @return <code>false</code> if UUID returned by {@link #getFilterUUID()} is derived from the base SIG UUID, <code>true</code> it it's a custom UUID
+	 * Whether the scanner must search only for devices with GENERAL_DISCOVERABLE or LIMITER_DISCOVERABLE flag set.
+	 *
+	 * @return <code>true</code> if devices must have one of those flags set in their advertisement packets
 	 */
-	protected boolean isCustomFilterUUID() {
-		return false;
+	protected boolean isDiscoverableRequired() {
+		return true;
 	}
 
 	/**
@@ -343,16 +344,16 @@ public abstract class BleProfileActivity extends ActionBarActivity implements Bl
 	 * 
 	 * @param filter
 	 *            the UUID filter used to filter out available devices. The fragment will always show all bonded devices as there is no information about their services
-	 * @param isCustomUUID
-	 *            <code>true</code> if filter is a custom UUID, <code>false</code> if derived from base SIG UUID
-	 * @see #getFilterUUID()
-	 * @see #isCustomFilterUUID()
+	 * @param discoverableRequired
+     *            <code>true</code> if devices must have GENERAL_DISCOVERABLE or LIMITED_DISCOVERABLE flags set in their advertisement packet
+     * @see #getFilterUUID()
+	 * @see #isDiscoverableRequired()
 	 */
-	private void showDeviceScanningDialog(final UUID filter, final boolean isCustomUUID) {
+	private void showDeviceScanningDialog(final UUID filter, final boolean discoverableRequired) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				final ScannerFragment dialog = ScannerFragment.getInstance(BleProfileActivity.this, filter, isCustomUUID);
+				final ScannerFragment dialog = ScannerFragment.getInstance(BleProfileActivity.this, filter, discoverableRequired);
 				dialog.show(getFragmentManager(), "scan_fragment");
 			}
 		});

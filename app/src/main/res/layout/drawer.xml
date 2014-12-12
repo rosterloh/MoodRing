@@ -32,11 +32,6 @@
                 android:text="@string/drawer_plugins"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@drawable/list_divider" />
-
             <TextView
                 android:id="@+id/link_settings"
                 android:layout_width="match_parent"

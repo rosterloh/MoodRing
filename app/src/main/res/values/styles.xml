@@ -1,7 +1,36 @@
 <resources>
 
+    <style name="TextAppearanceDialog" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+
+    <style name="TextAppearanceListItem" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+
+    <style name="TextAppearanceButton" parent="@android:style/TextAppearance.Holo.Widget.Button">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+
+    <style name="TextAppearanceTitle" parent="@style/TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearanceLarge" parent="@style/TextAppearance.AppCompat.Large">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="PopupMenuTextAppearanceSmall" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Small">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+    <style name="PopupMenuTextAppearanceLarge" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat">
         <!-- colorPrimary is used for the default action bar background -->
         <item name="colorPrimary">@color/red_500</item>
 
@@ -14,6 +43,9 @@
 
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight, and colorSwitchThumbNormal. -->
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
     </style>
 
 </resources>

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.1.1'
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
         applicationId "com.rosterloh.moodring"
@@ -13,10 +13,10 @@ android {
     }
     signingConfigs {
         production {
-            storeFile file("../android/debug.keystore")
+            storeFile file("./debug.keystore")
             storePassword "android"
-            keyAlias "androiddebugkey"
-            keyPassword "android"
+            keyAlias "moodring"
+            keyPassword "Sp@rky84"
         }
     }
     buildTypes {
@@ -42,9 +42,9 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:support-v13:21.0.2'
-    compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.2'
-    compile 'com.google.android.gms:play-services:6.1.71'
+    compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.larswerkman:HoloColorPicker:1.4'
-    compile 'com.melnykov:floatingactionbutton:1.0.9'
+    compile 'com.melnykov:floatingactionbutton:1.1.0'
 }

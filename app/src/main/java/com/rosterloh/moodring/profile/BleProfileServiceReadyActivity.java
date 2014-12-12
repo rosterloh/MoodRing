@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,10 +48,12 @@ import android.widget.Toast;
  * the activity, activity will to bind to the service and refresh UI.
  * </p>
  */
-public abstract class BleProfileServiceReadyActivity<E extends BleProfileService.LocalBinder> extends ActionBarActivity implements ScannerFragment.OnDeviceSelectedListener {
+public abstract class BleProfileServiceReadyActivity<E extends BleProfileService.LocalBinder> extends ActionBarActivity implements
+            ScannerFragment.OnDeviceSelectedListener {
 	private static final String TAG = "BleProfileServiceReadyActivity";
 
 	private static final String DEVICE_NAME = "device_name";
+    private static final String LOG_URI = "log_uri";
 	protected static final int REQUEST_ENABLE_BT = 2;
 
 	private E mService;
@@ -88,7 +91,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 				case BleProfileService.STATE_DISCONNECTING:
 					// current implementation does nothing in this states
 				default:
-					// there should be no other actions 
+					// there should be no other actions
 					break;
 
 				}
@@ -128,7 +131,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		@Override
 		public void onServiceConnected(final ComponentName name, final IBinder service) {
 			final E bleService = mService = (E) service;
-			Log.i(TAG, "Activity binded to the service");
+			Log.d(TAG, "Activity binded to the service");
 			onServiceBinded(bleService);
 
 			// update UI
@@ -143,7 +146,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 
 		@Override
 		public void onServiceDisconnected(final ComponentName name) {
-			Log.i(TAG, "Activity disconnected from the service");
+			Log.d(TAG, "Activity disconnected from the service");
 			mDeviceNameView.setText(getDefaultDeviceName());
 			mConnectButton.setText(R.string.action_connect);
 
@@ -166,12 +169,11 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		 * In this example we use the ProximityManager in the service. This class communicates with the service using local broadcasts. Final activity may bind to the Server
 		 * to use its interface.
 		 */
-		onInitialize();
+		onInitialize(savedInstanceState);
 		onCreateView(savedInstanceState);
 		onViewCreated(savedInstanceState);
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(mCommonBroadcastReceiver, makeIntentFilter());
-
 	}
 
 	@Override
@@ -183,7 +185,13 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		 * and notified via mServiceConnection.
 		 */
 		final Intent service = new Intent(this, getServiceClass());
-		bindService(service, mServiceConnection, 0); // we pass 0 as a flag so the service will not be created if not exists
+        if (bindService(service, mServiceConnection, 0)) // we pass 0 as a flag so the service will not be created if not exists
+            Log.d(TAG, "Binding to the service..."); // (* - see the comment below)
+
+		/*
+		 * * - When user exited the UARTActivity while being connected the log session is kept in the service. We may not get it before binding to it so in this
+		 * case this event will not be logged. It will, however, be logged after the orientation changes.
+		 */
 	}
 
 	@Override
@@ -191,11 +199,11 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		super.onStop();
 
 		try {
-			Log.v(TAG, "Unbinding from the service...");
+			Log.d(TAG, "Unbinding from the service...");
 			unbindService(mServiceConnection);
 			mService = null;
 
-			Log.i(TAG, "Activity unbinded from the service");
+			Log.d(TAG, "Activity unbinded from the service");
 			onServiceUnbinded();
 			mDeviceName = null;
 		} catch (final IllegalArgumentException e) {
@@ -221,14 +229,14 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	}
 
 	/**
-	 * Called when activity binds to the service. The parameter is the object returned in {@link Service#onBind(Intent)} method in your service. The method is called when device gets connected or is
-	 * created while sensor was connected before. You may use the binder as a sensor interface.
+	 * Called when activity binds to the service. The parameter is the object returned in {@link Service#onBind(Intent)} method in your service. The method is
+     * called when device gets connected or is created while sensor was connected before. You may use the binder as a sensor interface.
 	 */
 	protected abstract void onServiceBinded(E binder);
 
 	/**
-	 * Called when activity unbinds from the service. You may no longer use this binder because the sensor was disconnected. This method is also called when you leave the activity being connected to
-	 * the sensor in the background.
+	 * Called when activity unbinds from the service. You may no longer use this binder because the sensor was disconnected. This method is also called when you
+     * leave the activity being connected to the sensor in the background.
 	 */
 	protected abstract void onServiceUnbinded();
 
@@ -240,7 +248,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	protected abstract Class<? extends BleProfileService> getServiceClass();
 
 	/**
-	 * Returns the service interface that may be used to communicate with the sensor. This will return <code>null</code> if the device is disconnected from the sensor.
+	 * Returns the service interface that may be used to communicate with the sensor. This will return <code>null</code> if the device is disconnected from the
+     * sensor.
 	 * 
 	 * @return the service binder or <code>null</code>
 	 */
@@ -251,13 +260,13 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	/**
 	 * You may do some initialization here. This method is called from {@link #onCreate(Bundle)} before the view was created.
 	 */
-	protected void onInitialize() {
+	protected void onInitialize(final Bundle savedInstanceState) {
 		// empty default implementation
 	}
 
 	/**
-	 * Called from {@link #onCreate(Bundle)}. This method should build the activity UI, f.e. using {@link #setContentView(int)}. Use to obtain references to views. Connect/Disconnect button, the
-	 * device name view and battery level view are manager automatically.
+	 * Called from {@link #onCreate(Bundle)}. This method should build the activity UI, f.e. using {@link #setContentView(int)}. Use to obtain references to
+     * views. Connect/Disconnect button, the device name view and battery level view are manager automatically.
 	 * 
 	 * @param savedInstanceState
 	 *            contains the data it most recently supplied in {@link #onSaveInstanceState(Bundle)}. Note: <b>Otherwise it is null</b>.
@@ -268,10 +277,15 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 * Called after the view has been created.
 	 * 
 	 * @param savedInstanceState
+     *            contains the data it most recently supplied in {@link #onSaveInstanceState(Bundle)}. Note: <b>Otherwise it is null</b>.
 	 */
 	protected final void onViewCreated(final Bundle savedInstanceState) {
 		// set GUI
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 		mConnectButton = (Button) findViewById(R.id.action_connect);
 		mDeviceNameView = (TextView) findViewById(R.id.device_name);
 		mBatteryLevelView = (TextView) findViewById(R.id.battery);
@@ -327,7 +341,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		if (isBLEEnabled()) {
 			if (mService == null) {
 				setDefaultUI();
-				showDeviceScanningDialog(getFilterUUID(), isCustomFilterUUID());
+				showDeviceScanningDialog(getFilterUUID(), isDiscoverableRequired());
 			} else {
 				Log.v(TAG, "Disconnecting...");
 				mService.disconnect();
@@ -357,6 +371,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		final Intent service = new Intent(this, getServiceClass());
 		service.putExtra(BleProfileService.EXTRA_DEVICE_ADDRESS, device.getAddress());
 		startService(service);
+        Log.d(TAG, "Binding to the service...");
 		bindService(service, mServiceConnection, 0);
 	}
 
@@ -366,8 +381,9 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	}
 
 	/**
-	 * Called when the device has been connected. This does not mean that the application may start communication. A service discovery will be handled automatically after this call. Service discovery
-	 * may ends up with calling {@link #onServicesDiscovered()} or {@link #onDeviceNotSupported()} if required services have not been found.
+	 * Called when the device has been connected. This does not mean that the application may start communication. A service discovery will be handled
+     * automatically after this call. Service discovery may ends up with calling {@link #onServicesDiscovered()} or {@link #onDeviceNotSupported()} if required
+     * services have not been found.
 	 */
 	public void onDeviceConnected() {
 		mDeviceNameView.setText(mDeviceName);
@@ -375,19 +391,21 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	}
 
 	/**
-	 * Called when the device has disconnected (when the callback returned {@link BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)} with state DISCONNECTED.
+	 * Called when the device has disconnected (when the callback returned
+     * {@link BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)} with state DISCONNECTED.
 	 */
 	public void onDeviceDisconnected() {
 		mConnectButton.setText(R.string.action_connect);
 		mDeviceNameView.setText(getDefaultDeviceName());
-		mBatteryLevelView.setText(R.string.not_available);
+        if (mBatteryLevelView != null)
+            mBatteryLevelView.setText(R.string.not_available);
 
 		try {
-			Log.v(TAG, "Unbinding from the service...");
+			Log.d(TAG, "Unbinding from the service...");
 			unbindService(mServiceConnection);
 			mService = null;
 
-			Log.i(TAG, "Activity unbinded from the service");
+			Log.d(TAG, "Activity unbinded from the service");
 			onServiceUnbinded();
 			mDeviceName = null;
 		} catch (final IllegalArgumentException e) {
@@ -396,17 +414,18 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	}
 
 	/**
-	 * Some profiles may use this method to notify user that the link was lost. You must call this method in youe Ble Manager instead of {@link #onDeviceDisconnected()} while you discover
-	 * disconnection not initiated by the user.
+	 * Some profiles may use this method to notify user that the link was lost. You must call this method in youe Ble Manager instead of
+     * {@link #onDeviceDisconnected()} while you discover disconnection not initiated by the user.
 	 */
 	public void onLinklossOccur() {
-		mBatteryLevelView.setText(R.string.not_available);
+        if (mBatteryLevelView != null)
+            mBatteryLevelView.setText(R.string.not_available);
 	}
 
 	/**
-	 * Called when service discovery has finished and primary services has been found. The device is ready to operate. This method is not called if the primary, mandatory services were not found
-	 * during service discovery. For example in the Blood Pressure Monitor, a Blood Pressure service is a primary service and Intermediate Cuff Pressure service is a optional secondary service.
-	 * Existence of battery service is not notified by this call.
+	 * Called when service discovery has finished and primary services has been found. The device is ready to operate. This method is not called if the primary,
+     * mandatory services were not found during service discovery. For example in the Blood Pressure Monitor, a Blood Pressure service is a primary service and
+     * Intermediate Cuff Pressure service is a optional secondary service. Existence of battery service is not notified by this call.
 	 * 
 	 * @param optionalServicesFound
 	 *            if <code>true</code> the secondary services were also found on the device.
@@ -421,14 +440,15 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	}
 
 	/**
-	 * Called when the device has finished bonding process sucessfully
+	 * Called when the device has finished bonding process successfully
 	 */
 	public void onBonded() {
 		// empty default implementation
 	}
 
 	/**
-	 * Called when service discovery has finished but the main services were not found on the device. This may occur when connecting to bonded device that does not support required services.
+	 * Called when service discovery has finished but the main services were not found on the device. This may occur when connecting to bonded device that does
+     * not support required services.
 	 */
 	public void onDeviceNotSupported() {
 		showToast(R.string.not_supported);
@@ -441,7 +461,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 *            the battery value in percent
 	 */
 	public void onBatteryValueReceived(final int value) {
-		mBatteryLevelView.setText(getString(R.string.battery, value));
+        if (mBatteryLevelView != null)
+            mBatteryLevelView.setText(getString(R.string.battery, value));
 	}
 
 	/**
@@ -510,7 +531,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	protected abstract void setDefaultUI();
 
 	/**
-	 * Returns the default device name resource id. The real device name is obtained when connecting to the device. This one is used when device has disconnected.
+	 * Returns the default device name resource id. The real device name is obtained when connecting to the device. This one is used when device has
+     * disconnected.
 	 * 
 	 * @return the default device name resource id
 	 */
@@ -524,34 +546,35 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	protected abstract int getAboutTextId();
 
 	/**
-	 * The UUID filter is used to filter out available devices that does not have such UUID in their advertisement packet. See also: {@link #isChangingConfigurations()}.
+	 * The UUID filter is used to filter out available devices that does not have such UUID in their advertisement packet. See also:
+     * {@link #isChangingConfigurations()}.
 	 * 
 	 * @return the required UUID or <code>null</code>
 	 */
 	protected abstract UUID getFilterUUID();
 
-	/**
-	 * As the Android SDK can filter automatically only base SIG UUIDs, this flag allows to filter proprietary UUIDs using custom advertising data parsing. Default implementation returns
-	 * <code>false</code>.
-	 * 
-	 * @return <code>false</code> if UUID returned by {@link #getFilterUUID()} is derived from the base SIG UUID, <code>true</code> it it's a custom UUID
-	 */
-	protected boolean isCustomFilterUUID() {
-		return false;
-	}
+    /**
+     * Whether the scanner must search only for devices with GENERAL_DISCOVERABLE or LIMITER_DISCOVERABLE flag set.
+     *
+     * @return <code>true</code> if devices must have one of those flags set in their advertisement packets
+     */
+    protected boolean isDiscoverableRequired() {
+        return true;
+    }
 
 	/**
 	 * Shows the scanner fragment.
 	 * 
 	 * @param filter
-	 *            the UUID filter used to filter out available devices. The fragment will always show all bonded devices as there is no information about their services
-	 * @param isCustomUUID
+	 *            the UUID filter used to filter out available devices. The fragment will always show all bonded devices as there is no information about their
+     *            services
+	 * @param discoverableRequired
 	 *            <code>true</code> if filter is a custom UUID, <code>false</code> if derived from base SIG UUID
 	 * @see #getFilterUUID()
-	 * @see #isCustomFilterUUID()
+	 * @see #isDiscoverableRequired()
 	 */
-	private void showDeviceScanningDialog(final UUID filter, final boolean isCustomUUID) {
-		final ScannerFragment dialog = ScannerFragment.getInstance(BleProfileServiceReadyActivity.this, filter, isCustomUUID);
+	private void showDeviceScanningDialog(final UUID filter, final boolean discoverableRequired) {
+		final ScannerFragment dialog = ScannerFragment.getInstance(BleProfileServiceReadyActivity.this, filter, discoverableRequired);
 		dialog.show(getFragmentManager(), "scan_fragment");
 	}
 

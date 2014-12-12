@@ -1,4 +1,4 @@
-package com.rosterloh.moodring;
+package com.rosterloh.moodring.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.rosterloh.moodring.R;
 
 /**
  * @author   Richard Osterloh <richard.osterloh.com>
