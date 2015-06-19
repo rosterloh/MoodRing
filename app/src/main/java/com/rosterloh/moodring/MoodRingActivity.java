@@ -23,11 +23,14 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.rosterloh.moodring.adapters.AppAdapter;
+import com.rosterloh.moodring.events.MessageEvent;
 import com.rosterloh.moodring.profile.BleProfileService;
 import com.rosterloh.moodring.profile.BleProfileServiceReadyActivity;
 import com.rosterloh.moodring.util.AnalyticsManager;
 
 import java.util.UUID;
+
+import de.greenrobot.event.EventBus;
 
 import static com.rosterloh.moodring.util.LogUtils.LOGD;
 import static com.rosterloh.moodring.util.LogUtils.makeLogTag;
@@ -39,6 +42,23 @@ public class MoodRingActivity extends BleProfileServiceReadyActivity<MoodService
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    // This method will be called when a MessageEvent is posted
+    public void onEvent(MessageEvent event){
+        Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onCreateView(final Bundle savedInstanceState) {
