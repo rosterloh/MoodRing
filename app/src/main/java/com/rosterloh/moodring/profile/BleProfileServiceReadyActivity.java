@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -48,7 +49,7 @@ import android.widget.Toast;
  * the activity, activity will to bind to the service and refresh UI.
  * </p>
  */
-public abstract class BleProfileServiceReadyActivity<E extends BleProfileService.LocalBinder> extends ActionBarActivity implements
+public abstract class BleProfileServiceReadyActivity<E extends BleProfileService.LocalBinder> extends AppCompatActivity implements
             ScannerFragment.OnDeviceSelectedListener {
 	private static final String TAG = "BleProfileServiceReadyActivity";
 
