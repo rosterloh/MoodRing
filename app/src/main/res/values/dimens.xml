@@ -2,13 +2,11 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin_top">32dp</dimen>
-    <dimen name="activity_vertical_margin_bottom">16dp</dimen>
-    <dimen name="feature_horizontal_margin">50dp</dimen>
-    <dimen name="feature_vertical_margin_top">50dp</dimen>
-    <dimen name="feature_section_padding">8dp</dimen>
-    <dimen name="drawer_width">179dp</dimen>
-    <dimen name="drawer_padding_top">8dp</dimen>
-    <dimen name="mood_feature_title_long_margin">-192dp</dimen>
-    <dimen name="feature_device_name_margin_top">8dp</dimen>
+    <dimen name="et_margin_left">16dp</dimen>
+    <dimen name="et_margin_right">16dp</dimen>
+    <dimen name="dialog_padding">16dp</dimen>
+    <dimen name="listitem_padding_top">8dp</dimen>
+    <dimen name="listitem_padding_bottom">8dp</dimen>
+    <dimen name="device_icon_size">40dp</dimen>
+    <dimen name="activity_vertical_margin_bottom">32dp</dimen>
 </resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:paddingTop="@dimen/listitem_padding_top"
+    android:paddingBottom="@dimen/listitem_padding_bottom">
+
+    <ImageView
+        android:id="@+id/img_bluetooth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/ic_device_bg"
+        android:scaleType="center"
+        android:src="@drawable/ic_device_other"/>
+
+    <TextView
+        android:id="@+id/device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/img_bluetooth"
+        android:textSize="24sp"/>
+    <TextView
+        android:id="@+id/device_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/device_name"
+        android:layout_below="@+id/device_name"
+        android:textSize="12sp"/>
+
+</RelativeLayout>

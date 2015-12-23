@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <com.rosterloh.moodring.settings.AboutPreference
+        android:icon="@drawable/ic_launcher_about"
+        android:title="@string/settings_about_nrf_iot" />
+
+    <Preference
+        android:icon="@drawable/ic_nav_github"
+        android:title="@string/settings_about_github" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/NordicSemiconductor/Android-nRF-BLE-Joiner" />
+    </Preference>
+
+    <Preference
+        android:icon="@drawable/ic_nav_nordic"
+        android:summary="www.nordicsemi.com"
+        android:title="@string/settings_about_nordic" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="http://www.nordicsemi.com" />
+    </Preference>
+
+</PreferenceScreen>

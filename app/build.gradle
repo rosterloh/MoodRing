@@ -61,16 +61,21 @@ dependencies {
 
     // Google Play services split client libs. @see https://developers.google.com/android/guides/setup
     compile "com.google.android.gms:play-services-analytics:${google_play_services_client_library_version}"
+    compile "com.google.android.gms:play-services-location:${google_play_services_client_library_version}"
 
     // Android support libraries.
+    compile "com.android.support:design:${android_support_lib_version}"
     compile "com.android.support:appcompat-v7:${android_support_lib_version}"
     compile "com.android.support:recyclerview-v7:${android_support_lib_version}"
-    compile "com.android.support:design:${android_support_lib_version}"
-    compile "com.android.support:support-v13:${android_support_lib_version}"
+    compile "com.android.support:cardview-v7:${android_support_lib_version}"
+    compile "com.android.support:preference-v14:${android_support_lib_version}"
+
+    // Brings the new BluetoothLeScanner API to older platforms
+    compile 'no.nordicsemi.android.support.v18:scanner:0.1.1'
 
     compile 'com.larswerkman:HoloColorPicker:1.5'
-    compile 'com.melnykov:floatingactionbutton:1.3.0'
-    compile 'de.greenrobot:eventbus:2.4.0'
+    //compile 'com.melnykov:floatingactionbutton:1.3.0'
+    //compile 'de.greenrobot:eventbus:2.4.0'
 
     // Dependencies for android tests which reside in the "androidTest" src folder.
     //androidTestCompile 'com.android.support.test:runner:0.4.1'
